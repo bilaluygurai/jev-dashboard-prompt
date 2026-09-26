@@ -1,0 +1,131 @@
+GÖREV: Jev karar modelini kullanabileceğim basit bir web arayüzü kur.
+
+## 🎯 Amaç
+Jev'i test edebileceğim, farklı durumlarda nasıl karar verdiğini görebileceğim bir dashboard.
+
+## 📋 Gereksinimler
+
+### Teknik Stack
+- Next.js 16 (App Router) + TypeScript 7
+- TanStack AI SDK (@tanstack/ai)
+- Tailwind CSS v4
+- Server-side API calls (client'ta API key olmasın)
+
+### Sağlayıcı Desteği
+Üç farklı sağlayıcıyı destekle (ortam değişkeniyle seçilebilir):
+1. **Vercel AI Gateway** (öncelikli) - `@tanstack/ai-vercel-gateway`
+2. **TypeSafe doğrudan** - `@tanstack/ai-typesafe`
+3. **OpenRouter üzerinden** - `@tanstack/ai-openrouter`
+
+API Key: `.env.local` dosyasında yapılandırılmış
+
+### Soru Tipleri
+Jev'in 3 soru tipini destekle:
+
+1. **Boolean** - Evet/Hayır kararları
+   ```typescript
+   boolean({
+     instructions: "Müşteri memnun mu?"
+   })
+   ```
+
+2. **Choice** - Seçeneklerden biri
+   ```typescript
+   choice({
+     instructions: "Hangi departmana yönlendirilmeli?",
+     options: {
+       satis: "Satış talebi, demo",
+       destek: "Teknik destek, sorun",
+       fatura: "Ödeme, fatura, abonelik"
+     }
+   })
+   ```
+
+3. **Score** - Sıralı seviyeler
+   ```typescript
+   score({
+     instructions: "Müşteri memnuniyeti seviyesi?",
+     levels: ["cok_dusuk", "dusuk", "orta", "yuksek", "cok_yuksek"]
+   })
+   ```
+
+### Arayüz Özellikleri
+- **Tek sayfa**: Her şey bir ekranda
+- **Yan yana layout**: Sol tarafta input (durum + sorular), sağ tarafta sonuçlar
+  - Dikey scroll'a gerek kalmasın
+  - Compact ve minimalist
+- **Dinamik sorular**: Kullanıcı istediği tipte soru ekleyip silebilsin
+- **Hazır örnek**: Bir butona basınca test senaryosu yüklensin
+- **Güzel tasarım**: Modern, renkli, hoş görünüm
+
+### Örnek Test Senaryosu
+```
+Konu: Ödeme Sorunu
+
+Merhaba,
+
+3 gün önce yıllık abonelik için 1.200 TL ödeme yaptım ama hesabım hala premium'a geçmedi.
+Kredi kartımdan para çekildi, banka ekstremde görünüyor ama sisteminizde aktif görünmüyor.
+
+Bu durumu acil çözmeniz gerekiyor çünkü yarın önemli bir sunum için premium özelliklerini
+kullanmam gerekiyor. Eğer bugün içinde çözülmezse ödemeyi iptal ettirip başka bir servise
+geçeceğim.
+
+Lütfen en kısa sürede dönüş yapın.
+```
+
+Varsayılan sorular:
+1. **kategori** (choice) → satis, destek, fatura, yonetim
+2. **oncelik** (choice) → dusuk, orta, yuksek, kritik
+3. **ton** (choice) → notr, mutlu, endiseli, kizgin
+
+### Sonuç Gösterimi
+Her karar için göster:
+- Alan adı (field)
+- Seçilen değer
+- Olasılık (probability)
+- Score tipinde: ham score değeri
+- Choice tipinde: tüm seçeneklerin dağılımı (opsiyonel)
+
+### Güvenlik
+- API key sadece sunucu tarafında (.env.local)
+- Client'ta hiçbir şekilde açığa çıkmasın
+- Server Actions kullan
+
+## 🎨 Tasarım İstekleri
+- Modern gradient renk paletleri kullan
+- Glass morphism efektleri
+- Smooth animations ve transitions
+- Compact text sizes (küçük başlıklar, sıkı padding)
+- Side-by-side grid layout (lg:grid-cols-2)
+- Hover effects
+- Custom scrollbar
+- Responsive (mobil ve desktop)
+
+## 📁 Dosya Yapısı
+```
+app/
+  page.tsx          # Ana UI bileşeni
+  globals.css       # Tailwind v4 config
+lib/
+  types.ts          # TypeScript tipleri
+  decide-action.ts  # Server action (Jev çağrısı)
+  jev-decider.ts    # Sağlayıcı adaptörü
+.env.local          # API keys
+```
+
+## ⚠️ Önemli Notlar
+- TanStack AI core functions: `boolean`, `choice`, `decide`, `score` → `@tanstack/ai`'dan import et
+- Tailwind v4 syntax: `@import "tailwindcss"` (eski @tailwind direktifleri değil)
+- postcss.config: `@tailwindcss/postcss` plugin kullan
+- Score tipinde `legend` parametresi YOK, sadece `instructions` ve `levels`
+- Decide çağrısı: `decide({ adapter, state, questions })` formatında
+- TanStack AI'da `confidence` field'ı YOK, sadece `probability` var
+
+## 🚀 Başlangıç
+1. Bağımlılıkları kur
+2. .env.local'i yapılandır
+3. npm run dev ile başlat
+4. localhost:3000'de test et
+
+İşte bu kadar! Modern, kullanışlı, güzel bir Jev test arayüzü istiyorum.
